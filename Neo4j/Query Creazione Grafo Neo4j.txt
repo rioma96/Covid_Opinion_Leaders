@@ -1,0 +1,384 @@
+CALL apoc.periodic.iterate('MATCH (n) RETURN n', 'DETACH DELETE n', {batchSize:1000})
+
+CREATE INDEX user_index FOR (n:User) ON (n.twitter_id)
+
+
+#ANNO 2021
+
+:auto load csv with headers from "file:///2021/temporal_users.csv" as users
+CALL { 
+with users
+create (u:User {twitter_id:users.id, name:users.name, username:users.username, description:users.description, followers:toInteger(users.followers), following:toInteger(users.following),total_likes_count:toInteger(users.total_likes_count),
+like_Jan_2021:toInteger(users.like_Jan_2021),
+like_Feb_2021:toInteger(users.like_Feb_2021),
+like_Mar_2021:toInteger(users.like_Mar_2021),
+like_Apr_2021:toInteger(users.like_Apr_2021),
+like_May_2021:toInteger(users.like_May_2021),
+like_Jun_2021:toInteger(users.like_Jun_2021),
+like_Jul_2021:toInteger(users.like_Jul_2021),
+like_Aug_2021:toInteger(users.like_Aug_2021),
+like_Sept_2021:toInteger(users.like_Sept_2021),
+like_Oct_2021:toInteger(users.like_Oct_2021),
+like_Nov_2021:toInteger(users.like_Nov_2021),
+like_Dec_2021:toInteger(users.like_Dec_2021), 
+tweets_count:toInteger(users.tweet_count), quotes_count:toInteger(users.quote_count), replies_count:toInteger(users.reply_count), retweets_count:toInteger(users.retweet_count)})}
+IN TRANSACTIONS OF 10000 ROWS
+
+
+:auto load csv with headers from "file:///2021/temporal_mentioned_users.csv" as users
+CALL { 
+with users
+merge (a:User {twitter_id:users.id})
+on create set a.name=users.name, a.username=users.username, a.description=users.description, a.followers=toInteger(users.followers), a.following=toInteger(users.following),a.total_likes_count=toInteger(users.total_likes_count),
+a.like_Jan_2021=toInteger(users.like_Jan_2021),
+a.like_Feb_2021=toInteger(users.like_Feb_2021),
+a.like_Mar_2021=toInteger(users.like_Mar_2021),
+a.like_Apr_2021=toInteger(users.like_Apr_2021),
+a.like_May_2021=toInteger(users.like_May_2021),
+a.like_Jun_2021=toInteger(users.like_Jun_2021),
+a.like_Jul_2021=toInteger(users.like_Jul_2021),
+a.like_Aug_2021=toInteger(users.like_Aug_2021),
+a.like_Sept_2021=toInteger(users.like_Sept_2021),
+a.like_Oct_2021=toInteger(users.like_Oct_2021),
+a.like_Nov_2021=toInteger(users.like_Nov_2021),
+a.like_Dec_2021=toInteger(users.like_Dec_2021), 
+a.tweets_count=toInteger(users.tweet_count), a.quotes_count=toInteger(users.quote_count), a.replies_count=toInteger(users.reply_count), a.retweets_count=toInteger(users.retweet_count)}
+IN TRANSACTIONS OF 10000 ROWS
+return count(*) as total
+
+
+
+
+
+:auto load csv with headers from "file:///2021/temporal_relations.csv" as users
+CALL { 
+with users
+match (u1:User {twitter_id:users.author})
+match (u2:User {twitter_id:users.mentioned_user})
+MERGE (u1)-[i:INTERACTED]->(u2)
+on create set 
+i.total_interactions_count=toInteger(users.total_interactions_count),
+i.total_mentions_count=toInteger(users.total_mentions_count),
+i.total_quotes_count=toInteger(users.total_quotes_count),
+i.total_replies_count=toInteger(users.total_replies_count),
+i.total_retweets_count=toInteger(users.total_retweets_count),
+i.interactions_count_Jan_2021=toInteger(users.interactions_count_Jan_2021),
+i.interactions_count_Feb_2021=toInteger(users.interactions_count_Feb_2021),
+i.interactions_count_Mar_2021=toInteger(users.interactions_count_Mar_2021),
+i.interactions_count_Apr_2021=toInteger(users.interactions_count_Apr_2021),
+i.interactions_count_May_2021=toInteger(users.interactions_count_May_2021),
+i.interactions_count_Jun_2021=toInteger(users.interactions_count_Jun_2021),
+i.interactions_count_Jul_2021=toInteger(users.interactions_count_Jul_2021),
+i.interactions_count_Aug_2021=toInteger(users.interactions_count_Aug_2021),
+i.interactions_count_Sept_2021=toInteger(users.interactions_count_Sept_2021),
+i.interactions_count_Oct_2021=toInteger(users.interactions_count_Oct_2021),
+i.interactions_count_Nov_2021=toInteger(users.interactions_count_Nov_2021),
+i.interactions_count_Dec_2021=toInteger(users.interactions_count_Dec_2021),
+i.mentions_count_Jan_2021=toInteger(users.mentions_count_Jan_2021),
+i.mentions_count_Feb_2021=toInteger(users.mentions_count_Feb_2021),
+i.mentions_count_Mar_2021=toInteger(users.mentions_count_Mar_2021),
+i.mentions_count_Apr_2021=toInteger(users.mentions_count_Apr_2021),
+i.mentions_count_May_2021=toInteger(users.mentions_count_May_2021),
+i.mentions_count_Jun_2021=toInteger(users.mentions_count_Jun_2021),
+i.mentions_count_Jul_2021=toInteger(users.mentions_count_Jul_2021),
+i.mentions_count_Aug_2021=toInteger(users.mentions_count_Aug_2021),
+i.mentions_count_Sept_2021=toInteger(users.mentions_count_Sept_2021),
+i.mentions_count_Oct_2021=toInteger(users.mentions_count_Oct_2021),
+i.mentions_count_Nov_2021=toInteger(users.mentions_count_Nov_2021),
+i.mentions_count_Dec_2021=toInteger(users.mentions_count_Dec_2021),
+i.quotes_count_Jan_2021=toInteger(users.quotes_count_Jan_2021),
+i.quotes_count_Feb_2021=toInteger(users.quotes_count_Feb_2021),
+i.quotes_count_Mar_2021=toInteger(users.quotes_count_Mar_2021),
+i.quotes_count_Apr_2021=toInteger(users.quotes_count_Apr_2021),
+i.quotes_count_May_2021=toInteger(users.quotes_count_May_2021),
+i.quotes_count_Jun_2021=toInteger(users.quotes_count_Jun_2021),
+i.quotes_count_Jul_2021=toInteger(users.quotes_count_Jul_2021),
+i.quotes_count_Aug_2021=toInteger(users.quotes_count_Aug_2021),
+i.quotes_count_Sept_2021=toInteger(users.quotes_count_Sept_2021),
+i.quotes_count_Oct_2021=toInteger(users.quotes_count_Oct_2021),
+i.quotes_count_Nov_2021=toInteger(users.quotes_count_Nov_2021),
+i.quotes_count_Dec_2021=toInteger(users.quotes_count_Dec_2021),
+i.replies_count_Jan_2021=toInteger(users.replies_count_Jan_2021),
+i.replies_count_Feb_2021=toInteger(users.replies_count_Feb_2021),
+i.replies_count_Mar_2021=toInteger(users.replies_count_Mar_2021),
+i.replies_count_Apr_2021=toInteger(users.replies_count_Apr_2021),
+i.replies_count_May_2021=toInteger(users.replies_count_May_2021),
+i.replies_count_Jun_2021=toInteger(users.replies_count_Jun_2021),
+i.replies_count_Jul_2021=toInteger(users.replies_count_Jul_2021),
+i.replies_count_Aug_2021=toInteger(users.replies_count_Aug_2021),
+i.replies_count_Sept_2021=toInteger(users.replies_count_Sept_2021),
+i.replies_count_Oct_2021=toInteger(users.replies_count_Oct_2021),
+i.replies_count_Nov_2021=toInteger(users.replies_count_Nov_2021),
+i.replies_count_Dec_2021=toInteger(users.replies_count_Dec_2021),
+i.retweets_count_Jan_2021=toInteger(users.retweets_count_Jan_2021),
+i.retweets_count_Feb_2021=toInteger(users.retweets_count_Feb_2021),
+i.retweets_count_Mar_2021=toInteger(users.retweets_count_Mar_2021),
+i.retweets_count_Apr_2021=toInteger(users.retweets_count_Apr_2021),
+i.retweets_count_May_2021=toInteger(users.retweets_count_May_2021),
+i.retweets_count_Jun_2021=toInteger(users.retweets_count_Jun_2021),
+i.retweets_count_Jul_2021=toInteger(users.retweets_count_Jul_2021),
+i.retweets_count_Aug_2021=toInteger(users.retweets_count_Aug_2021),
+i.retweets_count_Sept_2021=toInteger(users.retweets_count_Sept_2021),
+i.retweets_count_Oct_2021=toInteger(users.retweets_count_Oct_2021),
+i.retweets_count_Nov_2021=toInteger(users.retweets_count_Nov_2021),
+i.retweets_count_Dec_2021=toInteger(users.retweets_count_Dec_2021)
+
+on match set 
+i.total_interactions_count=toInteger(i.total_interactions_count)+toInteger(users.total_interactions_count),
+i.total_mentions_count=toInteger(i.total_mentions_count)+toInteger(users.total_mentions_count),
+i.total_quotes_count=toInteger(i.total_quotes_count)+toInteger(users.total_quotes_count),
+i.total_replies_count=toInteger(i.total_replies_count)+toInteger(users.total_replies_count),
+i.total_retweets_count=toInteger(users.total_retweets_count)+toInteger(i.total_retweets_count),
+i.interactions_count_Jan_2021=toInteger(users.interactions_count_Jan_2021)+toInteger(i.interactions_count_Jan_2021),
+i.interactions_count_Feb_2021=toInteger(users.interactions_count_Feb_2021)+toInteger(i.interactions_count_Feb_2021),
+i.interactions_count_Mar_2021=toInteger(users.interactions_count_Mar_2021)+toInteger(i.interactions_count_Mar_2021),
+i.interactions_count_Apr_2021=toInteger(users.interactions_count_Apr_2021)+toInteger(i.interactions_count_Apr_2021),
+i.interactions_count_May_2021=toInteger(users.interactions_count_May_2021)+toInteger(i.interactions_count_May_2021),
+i.interactions_count_Jun_2021=toInteger(users.interactions_count_Jun_2021)+toInteger(i.interactions_count_Jun_2021),
+i.interactions_count_Jul_2021=toInteger(users.interactions_count_Jul_2021)+toInteger(i.interactions_count_Jul_2021),
+i.interactions_count_Aug_2021=toInteger(users.interactions_count_Aug_2021)+toInteger(i.interactions_count_Aug_2021),
+i.interactions_count_Sept_2021=toInteger(users.interactions_count_Sept_2021)+toInteger(i.interactions_count_Sept_2021),
+i.interactions_count_Oct_2021=toInteger(users.interactions_count_Oct_2021)+toInteger(i.interactions_count_Oct_2021),
+i.interactions_count_Nov_2021=toInteger(users.interactions_count_Nov_2021)+toInteger(i.interactions_count_Nov_2021),
+i.interactions_count_Dec_2021=toInteger(users.interactions_count_Dec_2021)+toInteger(i.interactions_count_Dec_2021),
+i.mentions_count_Jan_2021=toInteger(users.mentions_count_Jan_2021)+toInteger(i.mentions_count_Jan_2021),
+i.mentions_count_Feb_2021=toInteger(users.mentions_count_Feb_2021)+toInteger(i.mentions_count_Feb_2021),
+i.mentions_count_Mar_2021=toInteger(users.mentions_count_Mar_2021)+toInteger(i.mentions_count_Mar_2021),
+i.mentions_count_Apr_2021=toInteger(users.mentions_count_Apr_2021)+toInteger(i.mentions_count_Apr_2021),
+i.mentions_count_May_2021=toInteger(users.mentions_count_May_2021)+toInteger(i.mentions_count_May_2021),
+i.mentions_count_Jun_2021=toInteger(users.mentions_count_Jun_2021)+toInteger(i.mentions_count_Jun_2021),
+i.mentions_count_Jul_2021=toInteger(users.mentions_count_Jul_2021)+toInteger(i.mentions_count_Jul_2021),
+i.mentions_count_Aug_2021=toInteger(users.mentions_count_Aug_2021)+toInteger(i.mentions_count_Aug_2021),
+i.mentions_count_Sept_2021=toInteger(users.mentions_count_Sept_2021)+toInteger(i.mentions_count_Sept_2021),
+i.mentions_count_Oct_2021=toInteger(users.mentions_count_Oct_2021)+toInteger(i.mentions_count_Oct_2021),
+i.mentions_count_Nov_2021=toInteger(users.mentions_count_Nov_2021)+toInteger(i.mentions_count_Nov_2021),
+i.mentions_count_Dec_2021=toInteger(users.mentions_count_Dec_2021)+toInteger(i.mentions_count_Dec_2021),
+i.quotes_count_Jan_2021=toInteger(users.quotes_count_Jan_2021)+toInteger(i.quotes_count_Jan_2021),
+i.quotes_count_Feb_2021=toInteger(users.quotes_count_Feb_2021)+toInteger(i.quotes_count_Feb_2021),
+i.quotes_count_Mar_2021=toInteger(users.quotes_count_Mar_2021)+toInteger(i.quotes_count_Mar_2021),
+i.quotes_count_Apr_2021=toInteger(users.quotes_count_Apr_2021)+toInteger(i.quotes_count_Apr_2021),
+i.quotes_count_May_2021=toInteger(users.quotes_count_May_2021)+toInteger(i.quotes_count_May_2021),
+i.quotes_count_Jun_2021=toInteger(users.quotes_count_Jun_2021)+toInteger(i.quotes_count_Jun_2021),
+i.quotes_count_Jul_2021=toInteger(users.quotes_count_Jul_2021)+toInteger(i.quotes_count_Jul_2021),
+i.quotes_count_Aug_2021=toInteger(users.quotes_count_Aug_2021)+toInteger(i.quotes_count_Aug_2021),
+i.quotes_count_Sept_2021=toInteger(users.quotes_count_Sept_2021)+toInteger(i.quotes_count_Sept_2021),
+i.quotes_count_Oct_2021=toInteger(users.quotes_count_Oct_2021)+toInteger(i.quotes_count_Oct_2021),
+i.quotes_count_Nov_2021=toInteger(users.quotes_count_Nov_2021)+toInteger(i.quotes_count_Nov_2021),
+i.quotes_count_Dec_2021=toInteger(users.quotes_count_Dec_2021)+toInteger(i.quotes_count_Dec_2021),
+i.replies_count_Jan_2021=toInteger(users.replies_count_Jan_2021)+toInteger(i.replies_count_Jan_2021),
+i.replies_count_Feb_2021=toInteger(users.replies_count_Feb_2021)+toInteger(i.replies_count_Feb_2021),
+i.replies_count_Mar_2021=toInteger(users.replies_count_Mar_2021)+toInteger(i.replies_count_Mar_2021),
+i.replies_count_Apr_2021=toInteger(users.replies_count_Apr_2021)+toInteger(i.replies_count_Apr_2021),
+i.replies_count_May_2021=toInteger(users.replies_count_May_2021)+toInteger(i.replies_count_May_2021),
+i.replies_count_Jun_2021=toInteger(users.replies_count_Jun_2021)+toInteger(i.replies_count_Jun_2021),
+i.replies_count_Jul_2021=toInteger(users.replies_count_Jul_2021)+toInteger(i.replies_count_Jul_2021),
+i.replies_count_Aug_2021=toInteger(users.replies_count_Aug_2021)+toInteger(i.replies_count_Aug_2021),
+i.replies_count_Sept_2021=toInteger(users.replies_count_Sept_2021)+toInteger(i.replies_count_Sept_2021),
+i.replies_count_Oct_2021=toInteger(users.replies_count_Oct_2021)+toInteger(i.replies_count_Oct_2021),
+i.replies_count_Nov_2021=toInteger(users.replies_count_Nov_2021)+toInteger(i.replies_count_Nov_2021),
+i.replies_count_Dec_2021=toInteger(users.replies_count_Dec_2021)+toInteger(i.replies_count_Dec_2021),
+i.retweets_count_Jan_2021=toInteger(users.retweets_count_Jan_2021)+toInteger(i.retweets_count_Jan_2021),
+i.retweets_count_Feb_2021=toInteger(users.retweets_count_Feb_2021)+toInteger(i.retweets_count_Feb_2021),
+i.retweets_count_Mar_2021=toInteger(users.retweets_count_Mar_2021)+toInteger(i.retweets_count_Mar_2021),
+i.retweets_count_Apr_2021=toInteger(users.retweets_count_Apr_2021)+toInteger(i.retweets_count_Apr_2021),
+i.retweets_count_May_2021=toInteger(users.retweets_count_May_2021)+toInteger(i.retweets_count_May_2021),
+i.retweets_count_Jun_2021=toInteger(users.retweets_count_Jun_2021)+toInteger(i.retweets_count_Jun_2021),
+i.retweets_count_Jul_2021=toInteger(users.retweets_count_Jul_2021)+toInteger(i.retweets_count_Jul_2021),
+i.retweets_count_Aug_2021=toInteger(users.retweets_count_Aug_2021)+toInteger(i.retweets_count_Aug_2021),
+i.retweets_count_Sept_2021=toInteger(users.retweets_count_Sept_2021)+toInteger(i.retweets_count_Sept_2021),
+i.retweets_count_Oct_2021=toInteger(users.retweets_count_Oct_2021)+toInteger(i.retweets_count_Oct_2021),
+i.retweets_count_Nov_2021=toInteger(users.retweets_count_Nov_2021)+toInteger(i.retweets_count_Nov_2021),
+i.retweets_count_Dec_2021=toInteger(users.retweets_count_Dec_2021)+toInteger(i.retweets_count_Dec_2021)}
+IN TRANSACTIONS OF 20000 ROWS
+return count (*)
+
+
+#ANNO 2020
+
+:auto load csv with headers from "file:///2020/temporal_users.csv" as users
+CALL { 
+with users 
+create (u:User {twitter_id:users.id, name:users.name, username:users.username, description:users.description, followers:toInteger(users.followers), following:toInteger(users.following),total_likes_count:toInteger(users.total_likes_count),
+like_Jan_2020:toInteger(users.like_Jan_2020),
+like_Feb_2020:toInteger(users.like_Feb_2020),
+like_Mar_2020:toInteger(users.like_Mar_2020),
+like_Apr_2020:toInteger(users.like_Apr_2020),
+like_May_2020:toInteger(users.like_May_2020),
+like_Jun_2020:toInteger(users.like_Jun_2020),
+like_Jul_2020:toInteger(users.like_Jul_2020),
+like_Aug_2020:toInteger(users.like_Aug_2020),
+like_Sept_2020:toInteger(users.like_Sept_2020),
+like_Oct_2020:toInteger(users.like_Oct_2020),
+like_Nov_2020:toInteger(users.like_Nov_2020),
+like_Dec_2020:toInteger(users.like_Dec_2020), 
+tweets_count:toInteger(users.tweet_count), quotes_count:toInteger(users.quote_count), replies_count:toInteger(users.reply_count), retweets_count:toInteger(users.retweet_count)})}
+IN TRANSACTIONS OF 10000 ROWS
+
+:auto load csv with headers from "file:///2020/temporal_mentioned_users.csv" as users
+CALL { 
+with users 
+merge (a:User {twitter_id:users.id})
+on create set a.name=users.name, a.username=users.username, a.description=users.description, a.followers=toInteger(users.followers), a.following=toInteger(users.following),a.total_likes_count=toInteger(users.total_likes_count),
+a.like_Jan_2020=toInteger(users.like_Jan_2020),
+a.like_Feb_2020=toInteger(users.like_Feb_2020),
+a.like_Mar_2020=toInteger(users.like_Mar_2020),
+a.like_Apr_2020=toInteger(users.like_Apr_2020),
+a.like_May_2020=toInteger(users.like_May_2020),
+a.like_Jun_2020=toInteger(users.like_Jun_2020),
+a.like_Jul_2020=toInteger(users.like_Jul_2020),
+a.like_Aug_2020=toInteger(users.like_Aug_2020),
+a.like_Sept_2020=toInteger(users.like_Sept_2020),
+a.like_Oct_2020=toInteger(users.like_Oct_2020),
+a.like_Nov_2020=toInteger(users.like_Nov_2020),
+a.like_Dec_2020=toInteger(users.like_Dec_2020), 
+a.tweets_count=toInteger(users.tweet_count), a.quotes_count=toInteger(users.quote_count), a.replies_count=toInteger(users.reply_count), a.retweets_count=toInteger(users.retweet_count)}
+IN TRANSACTIONS OF 10000 ROWS
+return count(*) as total
+
+
+
+
+:auto load csv with headers from "file:///2020/temporal_relations.csv" as users
+CALL { 
+with users
+match (u1:User {twitter_id:users.author})
+match (u2:User {twitter_id:users.mentioned_user})
+MERGE (u1)-[i:INTERACTED]->(u2)
+on create set 
+i.total_interactions_count=toInteger(users.total_interactions_count),
+i.total_mentions_count=toInteger(users.total_mentions_count),
+i.total_quotes_count=toInteger(users.total_quotes_count),
+i.total_replies_count=toInteger(users.total_replies_count),
+i.total_retweets_count=toInteger(users.total_retweets_count),
+i.interactions_count_Jan_2020=toInteger(users.interactions_count_Jan_2020),
+i.interactions_count_Feb_2020=toInteger(users.interactions_count_Feb_2020),
+i.interactions_count_Mar_2020=toInteger(users.interactions_count_Mar_2020),
+i.interactions_count_Apr_2020=toInteger(users.interactions_count_Apr_2020),
+i.interactions_count_May_2020=toInteger(users.interactions_count_May_2020),
+i.interactions_count_Jun_2020=toInteger(users.interactions_count_Jun_2020),
+i.interactions_count_Jul_2020=toInteger(users.interactions_count_Jul_2020),
+i.interactions_count_Aug_2020=toInteger(users.interactions_count_Aug_2020),
+i.interactions_count_Sept_2020=toInteger(users.interactions_count_Sept_2020),
+i.interactions_count_Oct_2020=toInteger(users.interactions_count_Oct_2020),
+i.interactions_count_Nov_2020=toInteger(users.interactions_count_Nov_2020),
+i.interactions_count_Dec_2020=toInteger(users.interactions_count_Dec_2020),
+i.mentions_count_Jan_2020=toInteger(users.mentions_count_Jan_2020),
+i.mentions_count_Feb_2020=toInteger(users.mentions_count_Feb_2020),
+i.mentions_count_Mar_2020=toInteger(users.mentions_count_Mar_2020),
+i.mentions_count_Apr_2020=toInteger(users.mentions_count_Apr_2020),
+i.mentions_count_May_2020=toInteger(users.mentions_count_May_2020),
+i.mentions_count_Jun_2020=toInteger(users.mentions_count_Jun_2020),
+i.mentions_count_Jul_2020=toInteger(users.mentions_count_Jul_2020),
+i.mentions_count_Aug_2020=toInteger(users.mentions_count_Aug_2020),
+i.mentions_count_Sept_2020=toInteger(users.mentions_count_Sept_2020),
+i.mentions_count_Oct_2020=toInteger(users.mentions_count_Oct_2020),
+i.mentions_count_Nov_2020=toInteger(users.mentions_count_Nov_2020),
+i.mentions_count_Dec_2020=toInteger(users.mentions_count_Dec_2020),
+i.quotes_count_Jan_2020=toInteger(users.quotes_count_Jan_2020),
+i.quotes_count_Feb_2020=toInteger(users.quotes_count_Feb_2020),
+i.quotes_count_Mar_2020=toInteger(users.quotes_count_Mar_2020),
+i.quotes_count_Apr_2020=toInteger(users.quotes_count_Apr_2020),
+i.quotes_count_May_2020=toInteger(users.quotes_count_May_2020),
+i.quotes_count_Jun_2020=toInteger(users.quotes_count_Jun_2020),
+i.quotes_count_Jul_2020=toInteger(users.quotes_count_Jul_2020),
+i.quotes_count_Aug_2020=toInteger(users.quotes_count_Aug_2020),
+i.quotes_count_Sept_2020=toInteger(users.quotes_count_Sept_2020),
+i.quotes_count_Oct_2020=toInteger(users.quotes_count_Oct_2020),
+i.quotes_count_Nov_2020=toInteger(users.quotes_count_Nov_2020),
+i.quotes_count_Dec_2020=toInteger(users.quotes_count_Dec_2020),
+i.replies_count_Jan_2020=toInteger(users.replies_count_Jan_2020),
+i.replies_count_Feb_2020=toInteger(users.replies_count_Feb_2020),
+i.replies_count_Mar_2020=toInteger(users.replies_count_Mar_2020),
+i.replies_count_Apr_2020=toInteger(users.replies_count_Apr_2020),
+i.replies_count_May_2020=toInteger(users.replies_count_May_2020),
+i.replies_count_Jun_2020=toInteger(users.replies_count_Jun_2020),
+i.replies_count_Jul_2020=toInteger(users.replies_count_Jul_2020),
+i.replies_count_Aug_2020=toInteger(users.replies_count_Aug_2020),
+i.replies_count_Sept_2020=toInteger(users.replies_count_Sept_2020),
+i.replies_count_Oct_2020=toInteger(users.replies_count_Oct_2020),
+i.replies_count_Nov_2020=toInteger(users.replies_count_Nov_2020),
+i.replies_count_Dec_2020=toInteger(users.replies_count_Dec_2020),
+i.retweets_count_Jan_2020=toInteger(users.retweets_count_Jan_2020),
+i.retweets_count_Feb_2020=toInteger(users.retweets_count_Feb_2020),
+i.retweets_count_Mar_2020=toInteger(users.retweets_count_Mar_2020),
+i.retweets_count_Apr_2020=toInteger(users.retweets_count_Apr_2020),
+i.retweets_count_May_2020=toInteger(users.retweets_count_May_2020),
+i.retweets_count_Jun_2020=toInteger(users.retweets_count_Jun_2020),
+i.retweets_count_Jul_2020=toInteger(users.retweets_count_Jul_2020),
+i.retweets_count_Aug_2020=toInteger(users.retweets_count_Aug_2020),
+i.retweets_count_Sept_2020=toInteger(users.retweets_count_Sept_2020),
+i.retweets_count_Oct_2020=toInteger(users.retweets_count_Oct_2020),
+i.retweets_count_Nov_2020=toInteger(users.retweets_count_Nov_2020),
+i.retweets_count_Dec_2020=toInteger(users.retweets_count_Dec_2020)
+
+on match set 
+i.total_interactions_count=toInteger(i.total_interactions_count)+toInteger(users.total_interactions_count),
+i.total_mentions_count=toInteger(i.total_mentions_count)+toInteger(users.total_mentions_count),
+i.total_quotes_count=toInteger(i.total_quotes_count)+toInteger(users.total_quotes_count),
+i.total_replies_count=toInteger(i.total_replies_count)+toInteger(users.total_replies_count),
+i.total_retweets_count=toInteger(users.total_retweets_count)+toInteger(i.total_retweets_count),
+i.interactions_count_Jan_2020=toInteger(users.interactions_count_Jan_2020)+toInteger(i.interactions_count_Jan_2020),
+i.interactions_count_Feb_2020=toInteger(users.interactions_count_Feb_2020)+toInteger(i.interactions_count_Feb_2020),
+i.interactions_count_Mar_2020=toInteger(users.interactions_count_Mar_2020)+toInteger(i.interactions_count_Mar_2020),
+i.interactions_count_Apr_2020=toInteger(users.interactions_count_Apr_2020)+toInteger(i.interactions_count_Apr_2020),
+i.interactions_count_May_2020=toInteger(users.interactions_count_May_2020)+toInteger(i.interactions_count_May_2020),
+i.interactions_count_Jun_2020=toInteger(users.interactions_count_Jun_2020)+toInteger(i.interactions_count_Jun_2020),
+i.interactions_count_Jul_2020=toInteger(users.interactions_count_Jul_2020)+toInteger(i.interactions_count_Jul_2020),
+i.interactions_count_Aug_2020=toInteger(users.interactions_count_Aug_2020)+toInteger(i.interactions_count_Aug_2020),
+i.interactions_count_Sept_2020=toInteger(users.interactions_count_Sept_2020)+toInteger(i.interactions_count_Sept_2020),
+i.interactions_count_Oct_2020=toInteger(users.interactions_count_Oct_2020)+toInteger(i.interactions_count_Oct_2020),
+i.interactions_count_Nov_2020=toInteger(users.interactions_count_Nov_2020)+toInteger(i.interactions_count_Nov_2020),
+i.interactions_count_Dec_2020=toInteger(users.interactions_count_Dec_2020)+toInteger(i.interactions_count_Dec_2020),
+i.mentions_count_Jan_2020=toInteger(users.mentions_count_Jan_2020)+toInteger(i.mentions_count_Jan_2020),
+i.mentions_count_Feb_2020=toInteger(users.mentions_count_Feb_2020)+toInteger(i.mentions_count_Feb_2020),
+i.mentions_count_Mar_2020=toInteger(users.mentions_count_Mar_2020)+toInteger(i.mentions_count_Mar_2020),
+i.mentions_count_Apr_2020=toInteger(users.mentions_count_Apr_2020)+toInteger(i.mentions_count_Apr_2020),
+i.mentions_count_May_2020=toInteger(users.mentions_count_May_2020)+toInteger(i.mentions_count_May_2020),
+i.mentions_count_Jun_2020=toInteger(users.mentions_count_Jun_2020)+toInteger(i.mentions_count_Jun_2020),
+i.mentions_count_Jul_2020=toInteger(users.mentions_count_Jul_2020)+toInteger(i.mentions_count_Jul_2020),
+i.mentions_count_Aug_2020=toInteger(users.mentions_count_Aug_2020)+toInteger(i.mentions_count_Aug_2020),
+i.mentions_count_Sept_2020=toInteger(users.mentions_count_Sept_2020)+toInteger(i.mentions_count_Sept_2020),
+i.mentions_count_Oct_2020=toInteger(users.mentions_count_Oct_2020)+toInteger(i.mentions_count_Oct_2020),
+i.mentions_count_Nov_2020=toInteger(users.mentions_count_Nov_2020)+toInteger(i.mentions_count_Nov_2020),
+i.mentions_count_Dec_2020=toInteger(users.mentions_count_Dec_2020)+toInteger(i.mentions_count_Dec_2020),
+i.quotes_count_Jan_2020=toInteger(users.quotes_count_Jan_2020)+toInteger(i.quotes_count_Jan_2020),
+i.quotes_count_Feb_2020=toInteger(users.quotes_count_Feb_2020)+toInteger(i.quotes_count_Feb_2020),
+i.quotes_count_Mar_2020=toInteger(users.quotes_count_Mar_2020)+toInteger(i.quotes_count_Mar_2020),
+i.quotes_count_Apr_2020=toInteger(users.quotes_count_Apr_2020)+toInteger(i.quotes_count_Apr_2020),
+i.quotes_count_May_2020=toInteger(users.quotes_count_May_2020)+toInteger(i.quotes_count_May_2020),
+i.quotes_count_Jun_2020=toInteger(users.quotes_count_Jun_2020)+toInteger(i.quotes_count_Jun_2020),
+i.quotes_count_Jul_2020=toInteger(users.quotes_count_Jul_2020)+toInteger(i.quotes_count_Jul_2020),
+i.quotes_count_Aug_2020=toInteger(users.quotes_count_Aug_2020)+toInteger(i.quotes_count_Aug_2020),
+i.quotes_count_Sept_2020=toInteger(users.quotes_count_Sept_2020)+toInteger(i.quotes_count_Sept_2020),
+i.quotes_count_Oct_2020=toInteger(users.quotes_count_Oct_2020)+toInteger(i.quotes_count_Oct_2020),
+i.quotes_count_Nov_2020=toInteger(users.quotes_count_Nov_2020)+toInteger(i.quotes_count_Nov_2020),
+i.quotes_count_Dec_2020=toInteger(users.quotes_count_Dec_2020)+toInteger(i.quotes_count_Dec_2020),
+i.replies_count_Jan_2020=toInteger(users.replies_count_Jan_2020)+toInteger(i.replies_count_Jan_2020),
+i.replies_count_Feb_2020=toInteger(users.replies_count_Feb_2020)+toInteger(i.replies_count_Feb_2020),
+i.replies_count_Mar_2020=toInteger(users.replies_count_Mar_2020)+toInteger(i.replies_count_Mar_2020),
+i.replies_count_Apr_2020=toInteger(users.replies_count_Apr_2020)+toInteger(i.replies_count_Apr_2020),
+i.replies_count_May_2020=toInteger(users.replies_count_May_2020)+toInteger(i.replies_count_May_2020),
+i.replies_count_Jun_2020=toInteger(users.replies_count_Jun_2020)+toInteger(i.replies_count_Jun_2020),
+i.replies_count_Jul_2020=toInteger(users.replies_count_Jul_2020)+toInteger(i.replies_count_Jul_2020),
+i.replies_count_Aug_2020=toInteger(users.replies_count_Aug_2020)+toInteger(i.replies_count_Aug_2020),
+i.replies_count_Sept_2020=toInteger(users.replies_count_Sept_2020)+toInteger(i.replies_count_Sept_2020),
+i.replies_count_Oct_2020=toInteger(users.replies_count_Oct_2020)+toInteger(i.replies_count_Oct_2020),
+i.replies_count_Nov_2020=toInteger(users.replies_count_Nov_2020)+toInteger(i.replies_count_Nov_2020),
+i.replies_count_Dec_2020=toInteger(users.replies_count_Dec_2020)+toInteger(i.replies_count_Dec_2020),
+i.retweets_count_Jan_2020=toInteger(users.retweets_count_Jan_2020)+toInteger(i.retweets_count_Jan_2020),
+i.retweets_count_Feb_2020=toInteger(users.retweets_count_Feb_2020)+toInteger(i.retweets_count_Feb_2020),
+i.retweets_count_Mar_2020=toInteger(users.retweets_count_Mar_2020)+toInteger(i.retweets_count_Mar_2020),
+i.retweets_count_Apr_2020=toInteger(users.retweets_count_Apr_2020)+toInteger(i.retweets_count_Apr_2020),
+i.retweets_count_May_2020=toInteger(users.retweets_count_May_2020)+toInteger(i.retweets_count_May_2020),
+i.retweets_count_Jun_2020=toInteger(users.retweets_count_Jun_2020)+toInteger(i.retweets_count_Jun_2020),
+i.retweets_count_Jul_2020=toInteger(users.retweets_count_Jul_2020)+toInteger(i.retweets_count_Jul_2020),
+i.retweets_count_Aug_2020=toInteger(users.retweets_count_Aug_2020)+toInteger(i.retweets_count_Aug_2020),
+i.retweets_count_Sept_2020=toInteger(users.retweets_count_Sept_2020)+toInteger(i.retweets_count_Sept_2020),
+i.retweets_count_Oct_2020=toInteger(users.retweets_count_Oct_2020)+toInteger(i.retweets_count_Oct_2020),
+i.retweets_count_Nov_2020=toInteger(users.retweets_count_Nov_2020)+toInteger(i.retweets_count_Nov_2020),
+i.retweets_count_Dec_2020=toInteger(users.retweets_count_Dec_2020)+toInteger(i.retweets_count_Dec_2020)}
+IN TRANSACTIONS OF 20000 ROWS
+return count (*)
+
+
+

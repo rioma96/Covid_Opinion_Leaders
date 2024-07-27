@@ -1,0 +1,23 @@
+#RELAZIONI
+
+MATCH ()-[i:INTERACTED]->() with collect(i) as relations
+CALL apoc.export.csv.data([],relations, "relations2020.csv", {})
+YIELD file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data
+RETURN file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data
+
+MATCH ()-[i:INTERACTED]->() with collect(i) as relations
+CALL apoc.export.csv.data([],relations, "relations2021.csv", {})
+YIELD file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data
+RETURN file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data
+
+#NODI
+
+MATCH (u:User) with collect(u) as users
+CALL apoc.export.csv.data(users,[], "users2020.csv", {})
+YIELD file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data
+RETURN file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data
+
+MATCH (u:User) with collect(u) as users
+CALL apoc.export.csv.data(users,[], "users2021.csv", {})
+YIELD file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data
+RETURN file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data

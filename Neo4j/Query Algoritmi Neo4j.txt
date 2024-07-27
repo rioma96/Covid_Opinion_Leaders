@@ -1,0 +1,358 @@
+#2020
+
+#PROIEZIONE PER ALGORITMI
+
+match (n)-[r]-() 
+with DISTINCT keys(r) as prop
+limit 1
+with [x in prop where x contains "interactions_count"] as interactions_label
+CALL gds.graph.project(
+  'myGraph2020',
+  'User',
+  'INTERACTED',
+    {
+    relationshipProperties:interactions_label
+
+  }
+)
+YIELD
+  graphName AS graph,
+  relationshipProjection AS readProjection,
+  nodeCount AS nodes,
+  relationshipCount AS rels
+return count(*)
+
+
+
+
+#CLASSIC PAGE RANK SULLE MENSILIT°
+
+Match ()-[r:INTERACTED]->()
+with DISTINCT keys(r) as prop
+limit 1
+with [x in prop where x contains "interactions_count"] as interactions_label
+with [x in interactions_label where x contains "2020"] as interactions_label
+unwind interactions_label as label
+CALL gds.pageRank.stream('myGraph2020',
+  {
+    maxIterations: 20,
+    dampingFactor: 0.85,
+    relationshipWeightProperty: label
+
+  }
+)
+YIELD  nodeId, score
+with label,gds.util.asNode(nodeId).username AS username,gds.util.asNode(nodeId).name AS name, score
+ORDER BY score DESC, name ASC
+return  label,username, name, score
+
+--------------------------- Export Csv Version -----------------------------------------
+CALL apoc.export.csv.query("Match ()-[r:INTERACTED]->() with DISTINCT keys(r) as prop limit 1   with [x in prop where x contains 'interactions_count'] as interactions_label with [x in interactions_label where x contains '2020'] as interactions_label unwind interactions_label as label CALL gds.pageRank.stream('myGraph2020',{maxIterations: 20, dampingFactor: 0.85, relationshipWeightProperty: label}) YIELD  nodeId, score with label,gds.util.asNode(nodeId).username AS username,gds.util.asNode(nodeId).name AS name, score ORDER BY score DESC, name ASC return  label,username, name, score", "TPR.csv", {})
+----------------------------------------------------------------------------------------
+
+
+
+
+#LABEL COMMUNITY DETECTION INTERACTIONS COUNT
+
+Match ()-[r:INTERACTED]->()
+with DISTINCT keys(r) as prop
+limit 1
+with [x in prop where x contains "interactions_count"] as interactions_label
+with [x in interactions_label where x contains "2020"] as interactions_label
+unwind interactions_label as label
+CALL gds.labelPropagation.stream('myGraph2020',
+  {
+
+    relationshipWeightProperty: label
+
+  }
+)
+YIELD  nodeId, communityId
+with label,communityId,gds.util.asNode(nodeId).username AS username
+return label,communityId, username
+ORDER BY communityId asc
+
+
+---------------------------------------export csv version----------------------------
+CALL apoc.export.csv.query("Match ()-[r:INTERACTED]->() with DISTINCT keys(r) as prop limit 1 with [x in prop where x contains 'interactions_count'] as interactions_label with [x in interactions_label where x contains '2020'] as interactions_label unwind interactions_label as label CALL gds.labelPropagation.stream('myGraph2020',{relationshipWeightProperty: label}) YIELD  nodeId, communityId with label,communityId,gds.util.asNode(nodeId).username AS username return label,communityId, username ORDER BY communityId asc", "CDIC.csv", {})
+---------------------------------------------------------------------------------------
+
+
+
+#QUERY CREAZIONE PESI
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+"SET r.dc_weight_Jan_2020=toInteger(toInteger(u1.like_Jan_2020)*toInteger(r.interactions_count_Jan_2020)) return count(*)"
+,{batchSize: 10000});
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+"SET r.dc_weight_Feb_2020=toInteger(toInteger(u1.like_Feb_2020)*toInteger(r.interactions_count_Feb_2020)) return count(*)"
+,{batchSize: 10000});
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+"SET r.dc_weight_Mar_2020=toInteger(toInteger(u1.like_Mar_2020)*toInteger(r.interactions_count_Mar_2020)) return count(*)"
+,{batchSize: 10000});
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+"SET r.dc_weight_Apr_2020=toInteger(toInteger(u1.like_Apr_2020)*toInteger(r.interactions_count_Apr_2020)) return count(*)"
+,{batchSize: 10000});
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+"SET r.dc_weight_May_2020=toInteger(toInteger(u1.like_May_2020)*toInteger(r.interactions_count_May_2020)) return count(*)"
+,{batchSize: 10000});
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+"SET r.dc_weight_Jun_2020=toInteger(toInteger(u1.like_Jun_2020)*toInteger(r.interactions_count_Jun_2020)) return count(*)"
+,{batchSize: 10000});
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+"SET r.dc_weight_Jul_2020=toInteger(toInteger(u1.like_Jul_2020)*toInteger(r.interactions_count_Jul_2020)) return count(*)"
+,{batchSize: 10000});
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+"SET r.dc_weight_Aug_2020=toInteger(toInteger(u1.like_Aug_2020)*toInteger(r.interactions_count_Aug_2020)) return count(*)"
+,{batchSize: 10000});
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+"SET r.dc_weight_Sept_2020=toInteger(toInteger(u1.like_Sept_2020)*toInteger(r.interactions_count_Sept_2020)) return count(*)"
+,{batchSize: 10000});
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+"SET r.dc_weight_Oct_2020=toInteger(toInteger(u1.like_Oct_2020)*toInteger(r.interactions_count_Oct_2020)) return count(*)"
+,{batchSize: 10000});
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+"SET r.dc_weight_Nov_2020=toInteger(toInteger(u1.like_Nov_2020)*toInteger(r.interactions_count_Nov_2020)) return count(*)"
+,{batchSize: 10000});
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+"SET r.dc_weight_Dec_2020=toInteger(toInteger(u1.like_Dec_2020)*toInteger(r.interactions_count_Dec_2020)) return count(*)"
+,{batchSize: 10000});
+
+
+
+Match (u1:User)-[r:INTERACTED]->()
+with u1, r
+unwind ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"] as mese
+with u1, r, "interactions_count_"+mese+"_2020" as int, "dc_weight_"+mese+"_2020" as wl, "like_"+mese+"_2020" as ll
+SET r.wl=toInteger(toInteger(u1.ll)*toInteger(r.int))
+return count(*)
+
+
+#PROJECTION PER DEGREE CENTRALITY
+
+match (n)-[r]-() 
+with DISTINCT keys(r) as prop
+limit 1
+with [x in prop where x contains "weight"] as interactions_label
+CALL gds.graph.project(
+  'myGraph2020DC',
+  'User',
+  'INTERACTED',
+    {
+    relationshipProperties:interactions_label
+
+  }
+)
+YIELD
+  graphName AS graph,
+  relationshipProjection AS readProjection,
+  nodeCount AS nodes,
+  relationshipCount AS rels
+return count(*)
+
+
+
+#DEGREE CENTRALITY IMPORTANZA RICEVUTA
+
+Match ()-[r:INTERACTED]->()
+with DISTINCT keys(r) as prop
+limit 1
+with [x in prop where x contains "weight"] as interactions_label
+unwind interactions_label as label
+CALL gds.degree.stream('myGraph2020DC',
+  {
+
+    relationshipWeightProperty: label,
+    orientation: 'REVERSE'
+
+  }
+)
+YIELD  nodeId, score
+with label,gds.util.asNode(nodeId).username AS username,gds.util.asNode(nodeId).name AS name, score
+ORDER BY score DESC, name ASC
+return  label,username, name, score
+
+
+---------------------export csv version----------------------------------
+CALL apoc.export.csv.query("Match ()-[r:INTERACTED]->() with DISTINCT keys(r) as prop limit 1 with [x in prop where x contains 'weight'] as interactions_label unwind interactions_label as label CALL gds.degree.stream('myGraph2020DC',{relationshipWeightProperty: label,orientation: 'REVERSE'})YIELD  nodeId, score with label,gds.util.asNode(nodeId).username AS username,gds.util.asNode(nodeId).name AS name, score ORDER BY score DESC, name ASC return  label,username, name, score", "TDCI.csv", {})
+---------------------------------------------------------------------------
+
+#DEGREE CENTRALITY IMPORTANZA DATA QUINDI PIU ATTIVI
+
+Match ()-[r:INTERACTED]->()
+with DISTINCT keys(r) as prop
+limit 1
+with [x in prop where x contains "weight"] as interactions_label
+unwind interactions_label as label
+CALL gds.degree.stream('myGraph2020DC',
+  {
+
+    relationshipWeightProperty: label,
+    orientation: 'NATURAL'
+
+  }
+)
+YIELD  nodeId, score
+with label,gds.util.asNode(nodeId).username AS username,gds.util.asNode(nodeId).name AS name, score
+ORDER BY score DESC, name ASC
+return  label,username, name, score
+
+
+-------------export csv Version --------------
+CALL apoc.export.csv.query("Match ()-[r:INTERACTED]->() with DISTINCT keys(r) as prop limit 1 with [x in prop where x contains 'weight'] as interactions_label unwind interactions_label as label CALL gds.degree.stream('myGraph2020DC',{relationshipWeightProperty: label,orientation: 'NATURAL'})YIELD  nodeId, score with label,gds.util.asNode(nodeId).username AS username,gds.util.asNode(nodeId).name AS name, score ORDER BY score DESC, name ASC return  label,username, name, score", "TDCO.csv", {})
+-----------------------------------------
+
+
+
+#COMMUNITY DETECTION RWTWEETS COUNT
+
+Match ()-[r:INTERACTED]->()
+with DISTINCT keys(r) as prop
+limit 1
+with [x in prop where x contains "retweets_count"] as interactions_label
+unwind interactions_label as label
+CALL gds.labelPropagation.stream(
+  {
+    nodeProjection: 'User',
+    relationshipProjection: 'INTERACTED',
+    relationshipProperties: label, 
+    relationshipWeightProperty: label
+
+  }
+)
+YIELD  nodeId, communityId
+with label,communityId,gds.util.asNode(nodeId).usernameAS username
+return label,communityId, username 
+ORDER BY communityId asc
+
+----------------------------------Export csv version----------------------
+CALL apoc.export.csv.query("Match ()-[r:INTERACTED]->() with DISTINCT keys(r) as prop limit 1 with [x in prop where x contains 'retweets_count'] as retweets_label with [x in retweets_label where x contains '2020'] as retweets_label unwind retweets_label as label CALL gds.labelPropagation.stream({nodeProjection: 'User',relationshipProjection: 'INTERACTED',relationshipProperties: label, relationshipWeightProperty: label}) YIELD  nodeId, communityId with label,communityId,gds.util.asNode(nodeId).username AS username return label,communityId, username ORDER BY communityId asc", "CDRC.csv", {})
+----------------------------------------------------------------------------
+
+
+#2021
+
+#PROIEZIONE PER ALGORITMI
+
+match (n)-[r]-() 
+with DISTINCT keys(r) as prop
+limit 1
+with [x in prop where x contains "interactions_count"] as interactions_label
+CALL gds.graph.project(
+  'myGraph2021',
+  'User',
+  'INTERACTED',
+    {
+    relationshipProperties:interactions_label
+
+  }
+)
+YIELD
+  graphName AS graph,
+  relationshipProjection AS readProjection,
+  nodeCount AS nodes,
+  relationshipCount AS rels
+return count(*)
+
+
+
+
+#CLASSIC PAGE RANK SULLE MENSILIT°
+
+Match ()-[r:INTERACTED]->()
+with DISTINCT keys(r) as prop
+limit 1
+with [x in prop where x contains "interactions_count"] as interactions_label
+with [x in interactions_label where x contains "2021"] as interactions_label
+unwind interactions_label as label
+CALL gds.pageRank.stream('myGraph2021',
+  {
+    maxIterations: 20,
+    dampingFactor: 0.85,
+    relationshipWeightProperty: label
+
+  }
+)
+YIELD  nodeId, score
+with label,gds.util.asNode(nodeId).username AS username,gds.util.asNode(nodeId).name AS name, score
+ORDER BY score DESC, name ASC
+return  label,username, name, score
+
+--------------------------- Export Csv Version -----------------------------------------
+CALL apoc.export.csv.query("Match ()-[r:INTERACTED]->() with DISTINCT keys(r) as prop limit 1   with [x in prop where x contains 'interactions_count'] as interactions_label with [x in interactions_label where x contains '2021'] as interactions_label unwind interactions_label as label CALL gds.pageRank.stream('myGraph2021',{maxIterations: 20, dampingFactor: 0.85, relationshipWeightProperty: label}) YIELD  nodeId, score with label,gds.util.asNode(nodeId).username AS username,gds.util.asNode(nodeId).name AS name, score ORDER BY score DESC, name ASC return  label,username, name, score", "TPR.csv", {})
+----------------------------------------------------------------------------------------
+
+Match (u1:User)-[r:INTERACTED]->()
+SET r.dc_weight_Jan_2021=toInteger(toInteger(u1.like_Jan_2021)*toInteger(r.interactions_count_Jan_2021))
+return count(*)
+
+Match (u1:User)-[r:INTERACTED]->()
+SET r.dc_weight_Feb_2021=toInteger(toInteger(u1.like_Feb_2021)*toInteger(r.interactions_count_Feb_2021))
+return count(*)
+
+Match (u1:User)-[r:INTERACTED]->()
+SET r.dc_weight_Mar_2021=toInteger(toInteger(u1.like_Mar_2021)*toInteger(r.interactions_count_Mar_2021))
+return count(*)
+
+Match (u1:User)-[r:INTERACTED]->()
+SET r.dc_weight_Apr_2021=toInteger(toInteger(u1.like_Apr_2021)*toInteger(r.interactions_count_Apr_2021))
+return count(*)
+
+Match (u1:User)-[r:INTERACTED]->()
+SET r.dc_weight_May_2021=toInteger(toInteger(u1.like_May_2021)*toInteger(r.interactions_count_May_2021))
+return count(*)
+
+Match (u1:User)-[r:INTERACTED]->()
+SET r.dc_weight_Jun_2021=toInteger(toInteger(u1.like_Jun_2021)*toInteger(r.interactions_count_Jun_2021))
+return count(*)
+
+Match (u1:User)-[r:INTERACTED]->()
+SET r.dc_weight_Jul_2021=toInteger(toInteger(u1.like_Jul_2021)*toInteger(r.interactions_count_Jul_2021))
+return count(*)
+
+Match (u1:User)-[r:INTERACTED]->()
+SET r.dc_weight_Aug_2021=toInteger(toInteger(u1.like_Aug_2021)*toInteger(r.interactions_count_Aug_2021))
+return count(*)
+
+Match (u1:User)-[r:INTERACTED]->()
+SET r.dc_weight_Sept_2021=toInteger(toInteger(u1.like_Sept_2021)*toInteger(r.interactions_count_Sept_2021))
+return count(*)
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+" SET r.dc_weight_Oct_2021=toInteger(toInteger(u1.like_Oct_2021)*toInteger(r.interactions_count_Oct_2021))"
+,{batchSize: 10000});
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+" SET r.dc_weight_Nov_2021=toInteger(toInteger(u1.like_Nov_2021)*toInteger(r.interactions_count_Nov_2021))"
+,{batchSize: 10000});
+
+CALL apoc.periodic.iterate(
+"Match (u1:User)-[r:INTERACTED]->() return u1,r",
+" SET r.dc_weight_Dec_2021=toInteger(toInteger(u1.like_Dec_2021)*toInteger(r.interactions_count_Dec_2021))"
+,{batchSize: 10000});
