@@ -21,7 +21,6 @@ To get started, clone the repository and install the required dependencies:
 ```bash
 git clone https://github.com/yourusername/graph-based-opinion-leaders.git
 cd graph-based-opinion-leaders
-pip install -r requirements.txt
 ```
 
 ## Usage
