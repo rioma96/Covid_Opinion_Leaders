@@ -25,7 +25,12 @@ cd graph-based-opinion-leaders
 
 ## Usage
 
-Detailed instructions on how to use the code, including example commands and scripts, can be found in the [Usage Guide](USAGE.md).
+1) Downloads X's Tweets referring using their API.
+2) Split Tweets in files month-by-month.
+3) Execute 'Codice_Preparazione_Dati.py'
+4) Create a Neo4j project and execute queries contained in 'Query Creazione Grafo Neo4j.txt' and then in 'Query Algoritmi Neo4j.txt'.
+5) Execute 'Query Conversione Neo4j a Csv.txt' to convert Neo4j graph in csv format to be imported in NetworkX.
+6) Execute 'Codice_Analisi_con_Risultati.ipynb' to calculate results.
 
 ## Data
 
@@ -41,4 +46,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 
-For any questions or issues, please open an issue in this repository or contact us at [your-email@example.com](mailto:luca.mariotti@unimore.it).
+For any questions or issues, please open an issue in this repository or contact us at [luca.mariotti@unimore.it](mailto:luca.mariotti@unimore.it).
